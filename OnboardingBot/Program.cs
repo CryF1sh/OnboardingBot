@@ -34,7 +34,7 @@ namespace OnboardingBot
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Запущен бот " + Client.GetMeAsync().Result.FirstName);
+            Console.WriteLine("Bot launched: " + Client.GetMeAsync().Result.FirstName);
 
             var cts = new CancellationTokenSource();
             var cancellationToken = cts.Token;
