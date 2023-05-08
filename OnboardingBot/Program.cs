@@ -8,7 +8,7 @@ namespace OnboardingBot
 {
     class Program
     {
-        static ITelegramBotClient Client = new TelegramBotClient("5654249846:AAHU6xVbyc8vGMpODDM9h9kAfS4khjBUgig");
+        static ITelegramBotClient BotClient = new TelegramBotClient("5654249846:AAHU6xVbyc8vGMpODDM9h9kAfS4khjBUgig");
         public static async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
             // Некоторые действия
@@ -34,7 +34,7 @@ namespace OnboardingBot
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Bot launched: " + Client.GetMeAsync().Result.FirstName);
+            Console.WriteLine("Bot launched: " + BotClient.GetMeAsync().Result.FirstName);
 
             var cts = new CancellationTokenSource();
             var cancellationToken = cts.Token;
@@ -42,7 +42,7 @@ namespace OnboardingBot
             {
                 AllowedUpdates = { }, // receive all update types
             };
-            Client.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions, cancellationToken);
+            BotClient.StartReceiving(HandleUpdateAsync, HandleErrorAsync, receiverOptions, cancellationToken);
             Console.ReadLine();
         }
     }
