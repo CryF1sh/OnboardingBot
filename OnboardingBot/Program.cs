@@ -1,18 +1,13 @@
 ﻿using Newtonsoft.Json;
+using OnboardingBot.Models;
 using System.Net.Http.Headers;
+using System.Text;
 using Telegram.Bot;
-using Telegram.Bot.Args;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using System.Collections.Generic;
-using OnboardingBot.Models;
 using Telegram.Bot.Types.ReplyMarkups;
-using Telegram.Bot.Types.InlineQueryResults;
-using System.Text;
-using System.Net.Http;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using Server.Entities;
+using Update = Telegram.Bot.Types.Update;
 
 namespace OnboardingBot
 {
@@ -21,8 +16,9 @@ namespace OnboardingBot
         static HttpClient HttpClient = new HttpClient();
         static ITelegramBotClient BotClient = new TelegramBotClient("5654249846:AAHU6xVbyc8vGMpODDM9h9kAfS4khjBUgig");
 
-        public static async Task HandleUpdatesAsync(ITelegramBotClient botClient, Telegram.Bot.Types.Update update, CancellationToken cancellationToken)
+        public static async Task HandleUpdatesAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
+            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(update));
             if (update.Type == UpdateType.Message && update?.Message?.Text != null)
             {
                 await HandleMessage(botClient, update.Message);
@@ -34,10 +30,33 @@ namespace OnboardingBot
                 await HandleCallbackQuery(botClient, update.CallbackQuery, cancellationToken);
                 return;
             }
+            HttpResponseMessage registrationResponse = await HttpClient.GetAsync("api/Users/" + update.Message.From.Id);
+
+            if (registrationResponse.IsSuccessStatusCode)//Проверка на зарегетрированного пользователя
+            {
+                switch (update.Message.Text)
+                {
+                    case "/my_teachers":
+                        await HandleOptionEmployees(botClient, update);
+                        break;
+                    case "/search_cabinet":
+                        await HandleOptionSearchCabinets(botClient, update);
+                        break;
+                    case "/question":
+                        await HandleOptionQuestion(botClient, update);
+                        break;
+                    case "/useful_links":
+                        await HandleOptionUsefulLinks(botClient, update);
+                        break;
+                }
+            }
+            else
+            {
+                await botClient.SendTextMessageAsync(update.Message.Chat.Id, "Ошибка! Для начала необходимо пройти регистрацию!");
+            }
         }
         public static async Task HandleMessage(ITelegramBotClient botClient, Message message)
         {
-            //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(update));
             if (message.Text.ToLower() == "/start")
             {
                 await botClient.SendTextMessageAsync(message.Chat.Id, "Привет! Я Чат-бот путеводитель твоих первых шагов в нашем техникуме, моя задача помогать новым студентам адаптироваться к новым условиям!");
@@ -67,12 +86,14 @@ namespace OnboardingBot
 
                 return;
             }
+
             await botClient.SendTextMessageAsync(message.Chat.Id, "Ошибка! Не удалось распознать команду!");
         }
 
         public static async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callbackQuery, CancellationToken cancellationToken)
         {
             var buttonData = callbackQuery.Data;
+            //Регистрация пользователя
             if (buttonData.StartsWith("direction_"))
             {
                 string directionId = buttonData.Substring(10);
@@ -101,12 +122,11 @@ namespace OnboardingBot
             }
         }
 
-        
         public static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {
             // Некоторые действия
             Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(exception));
-        }
+        }            
 
         static void Main(string[] args)
         {
@@ -118,11 +138,41 @@ namespace OnboardingBot
             var cancellationToken = cts.Token;
             var receiverOptions = new ReceiverOptions
             {
-                AllowedUpdates = { }, // receive all update types
+                AllowedUpdates = { }, 
             };
             BotClient.StartReceiving(HandleUpdatesAsync, HandleErrorAsync, receiverOptions, cancellationToken);
-            Console.ReadLine();
         }
+
+
+        private static async Task HandleOptionEmployees(ITelegramBotClient botClient, Update update)
+
+        {
+            var message = update.Message;
+            await botClient.SendTextMessageAsync(message.Chat.Id, "Сотрудники");
+            return;
+        }
+
+        private static async Task HandleOptionSearchCabinets(ITelegramBotClient botClient, Update update)
+        {
+            var message = update.Message;
+            await botClient.SendTextMessageAsync(message.Chat.Id, "Поиск кабинета");
+            return;
+        }
+
+        private static async Task HandleOptionQuestion(ITelegramBotClient botClient, Update update)
+        {
+            var message = update.Message;
+            await botClient.SendTextMessageAsync(message.Chat.Id, "Задать вопрос");
+            return;
+        }
+
+        private static async Task HandleOptionUsefulLinks(ITelegramBotClient botClient, Update update)
+        {
+            var message = update.Message;
+            await botClient.SendTextMessageAsync(message.Chat.Id, "Полезные ссылки");
+            return;
+        }
+
         static async Task RunAsync()
         {
             HttpClient.BaseAddress = new Uri("https://localhost:7290");
