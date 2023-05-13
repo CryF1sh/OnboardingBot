@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using OnboardingBot.Models;
+using Server.Entities;
 using System.Net.Http.Headers;
 using System.Text;
 using Telegram.Bot;
@@ -169,8 +170,24 @@ namespace OnboardingBot
         private static async Task HandleOptionUsefulLinks(ITelegramBotClient botClient, Update update)
         {
             var message = update.Message.Chat.Id;
+            string UlMessage = "Полезные ссылки:\n\n";
 
-            await botClient.SendTextMessageAsync(message, "Полезные ссылки");
+            HttpResponseMessage response = await HttpClient.GetAsync("api/UsefulLinks");
+            if (response == null)
+            {
+                await botClient.SendTextMessageAsync(message, "Ошибка! Не удалось отобразить полезные ссылки!");
+                return;
+            }
+            string responseContent = await response.Content.ReadAsStringAsync();
+            //Десирилизация json в список
+            List<UsefulLink> usefulLinks = JsonConvert.DeserializeObject<List<UsefulLink>>(responseContent);
+
+            foreach (UsefulLink usefulLink in usefulLinks)
+            {
+                UlMessage += $"{usefulLink.Link} - {usefulLink.Description}";
+            }
+
+            await botClient.SendTextMessageAsync(message, UlMessage);
             return;
         }
 
