@@ -147,29 +147,30 @@ namespace OnboardingBot
         private static async Task HandleOptionEmployees(ITelegramBotClient botClient, Update update)
 
         {
-            var message = update.Message;
-            await botClient.SendTextMessageAsync(message.Chat.Id, "Сотрудники");
+            var message = update.Message.Chat.Id;
+            await botClient.SendTextMessageAsync(message, "Сотрудники");
             return;
         }
 
         private static async Task HandleOptionSearchCabinets(ITelegramBotClient botClient, Update update)
         {
-            var message = update.Message;
-            await botClient.SendTextMessageAsync(message.Chat.Id, "Поиск кабинета");
+            var message = update.Message.Chat.Id;
+            await botClient.SendTextMessageAsync(message, "Поиск кабинета");
             return;
         }
 
         private static async Task HandleOptionQuestion(ITelegramBotClient botClient, Update update)
         {
-            var message = update.Message;
-            await botClient.SendTextMessageAsync(message.Chat.Id, "Задать вопрос");
+            var message = update.Message.Chat.Id;
+            await botClient.SendTextMessageAsync(message, "Задать вопрос");
             return;
         }
 
         private static async Task HandleOptionUsefulLinks(ITelegramBotClient botClient, Update update)
         {
-            var message = update.Message;
-            await botClient.SendTextMessageAsync(message.Chat.Id, "Полезные ссылки");
+            var message = update.Message.Chat.Id;
+
+            await botClient.SendTextMessageAsync(message, "Полезные ссылки");
             return;
         }
 
