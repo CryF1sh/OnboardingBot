@@ -40,12 +40,12 @@ namespace OnboardingBot
                     case "/my_teachers":
                         await HandleOptionEmployees(botClient, update);
                         break;
-                    case "/search_cabinet":
-                        await HandleOptionSearchCabinets(botClient, update);
-                        break;
-                    case "/question":
-                        await HandleOptionQuestion(botClient, update);
-                        break;
+                    //case "/search_cabinet":
+                    //    await HandleOptionSearchCabinets(botClient, update);
+                    //    break;
+                    //case "/question":
+                    //    await HandleOptionQuestion(botClient, update);
+                    //    break;
                     case "/useful_links":
                         await HandleOptionUsefulLinks(botClient, update);
                         break;
@@ -88,7 +88,7 @@ namespace OnboardingBot
                 return;
             }
 
-            await botClient.SendTextMessageAsync(message.Chat.Id, "Ошибка! Не удалось распознать команду!");
+            //await botClient.SendTextMessageAsync(message.Chat.Id, "Ошибка! Не удалось распознать команду!");
         }
 
         public static async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callbackQuery, CancellationToken cancellationToken)
@@ -119,6 +119,23 @@ namespace OnboardingBot
                 else
                 {
                     await botClient.SendTextMessageAsync(callbackQuery.Message.Chat.Id, "Ошибка! Не удалось провести регистрацию!");
+                }
+            }
+            if (callbackQuery.Data.StartsWith("/search_cabinet"))
+            {
+                string cabinetNumber = callbackQuery.Data.Substring("/search_cabinet ".Length);
+                HttpResponseMessage response = await HttpClient.GetAsync($"api/Cabinets/search/{cabinetNumber}");
+                if (response == null)
+                {
+                    await botClient.SendTextMessageAsync(callbackQuery.Message.Chat.Id, "Ошибка! Не удалось найти кабинет!");
+                    return;
+                }
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseContent = await response.Content.ReadAsStringAsync();
+                    Cabinet cabinet = JsonConvert.DeserializeObject<Cabinet>(responseContent);
+                    await botClient.SendTextMessageAsync(callbackQuery.Message.Chat.Id, $"Найден кабинет:\n № кабинета {cabinet.Number}\n Кабинет называется: {cabinet.Name}\n\n Кабинет расположен: {cabinet.FloorLayoutId}");
+                    return;
                 }
             }
         }
@@ -153,19 +170,19 @@ namespace OnboardingBot
             return;
         }
 
-        private static async Task HandleOptionSearchCabinets(ITelegramBotClient botClient, Update update)
-        {
-            var message = update.Message.Chat.Id;
-            await botClient.SendTextMessageAsync(message, "Поиск кабинета");
-            return;
-        }
+        //private static async Task HandleOptionSearchCabinets(ITelegramBotClient botClient, Update update)
+        //{
+        //    var message = update.Message.Chat.Id;
+        //    await botClient.SendTextMessageAsync(message, "Поиск кабинета");
+        //    return;
+        //}
 
-        private static async Task HandleOptionQuestion(ITelegramBotClient botClient, Update update)
-        {
-            var message = update.Message.Chat.Id;
-            await botClient.SendTextMessageAsync(message, "Задать вопрос");
-            return;
-        }
+        //private static async Task HandleOptionQuestion(ITelegramBotClient botClient, Update update)
+        //{
+        //    var message = update.Message.Chat.Id;
+        //    await botClient.SendTextMessageAsync(message, "Задать вопрос");
+        //    return;
+        //}
 
         private static async Task HandleOptionUsefulLinks(ITelegramBotClient botClient, Update update)
         {
