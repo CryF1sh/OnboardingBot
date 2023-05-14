@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using OnboardingBot.Models;
+using Server;
 using Server.Entities;
 using System.Net.Http.Headers;
 using System.Text;
@@ -19,18 +20,21 @@ namespace OnboardingBot
 
         public static async Task HandleUpdatesAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
+            //Логируем каждое сообщение
             Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(update));
+            //Подписываемся на получение сообщений 
             if (update.Type == UpdateType.Message && update?.Message?.Text != null)
             {
                 await HandleMessage(botClient, update.Message);
                 return;
             }
-
+            //Подписываемся на получение ответов
             if (update.Type == UpdateType.CallbackQuery)
             {
                 await HandleCallbackQuery(botClient, update.CallbackQuery, cancellationToken);
                 return;
             }
+
             HttpResponseMessage registrationResponse = await HttpClient.GetAsync("api/Users/" + update.Message.From.Id);
 
             if (registrationResponse.IsSuccessStatusCode)//Проверка на зарегетрированного пользователя
@@ -40,12 +44,6 @@ namespace OnboardingBot
                     case "/my_teachers":
                         await HandleOptionEmployees(botClient, update);
                         break;
-                    //case "/search_cabinet":
-                    //    await HandleOptionSearchCabinets(botClient, update);
-                    //    break;
-                    //case "/question":
-                    //    await HandleOptionQuestion(botClient, update);
-                    //    break;
                     case "/useful_links":
                         await HandleOptionUsefulLinks(botClient, update);
                         break;
@@ -53,11 +51,12 @@ namespace OnboardingBot
             }
             else
             {
-                await botClient.SendTextMessageAsync(update.Message.Chat.Id, "Ошибка! Для начала необходимо пройти регистрацию!");
+                await botClient.SendTextMessageAsync(update.Message.Chat.Id, "Ошибка! Для начала необходимо пройти регистрацию!\n Используйте /start, необходимо выбрать направление");
             }
         }
         public static async Task HandleMessage(ITelegramBotClient botClient, Message message)
         {
+            #region /start, Отправка сообщения для регистрация
             if (message.Text.ToLower() == "/start")
             {
                 await botClient.SendTextMessageAsync(message.Chat.Id, "Привет! Я Чат-бот путеводитель твоих первых шагов в нашем техникуме, моя задача помогать новым студентам адаптироваться к новым условиям!");
@@ -87,6 +86,7 @@ namespace OnboardingBot
 
                 return;
             }
+            #endregion
 
             //await botClient.SendTextMessageAsync(message.Chat.Id, "Ошибка! Не удалось распознать команду!");
         }
@@ -94,7 +94,8 @@ namespace OnboardingBot
         public static async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callbackQuery, CancellationToken cancellationToken)
         {
             var buttonData = callbackQuery.Data;
-            //Регистрация пользователя
+
+            #region Регистрация пользователя
             if (buttonData.StartsWith("direction_"))
             {
                 string directionId = buttonData.Substring(10);
@@ -121,6 +122,11 @@ namespace OnboardingBot
                     await botClient.SendTextMessageAsync(callbackQuery.Message.Chat.Id, "Ошибка! Не удалось провести регистрацию!");
                 }
             }
+            #endregion
+
+
+
+            #region Функция Поиск кабинета
             if (callbackQuery.Data.StartsWith("/search_cabinet"))
             {
                 string cabinetNumber = callbackQuery.Data.Substring("/search_cabinet ".Length);
@@ -132,17 +138,54 @@ namespace OnboardingBot
                 }
                 if (response.IsSuccessStatusCode)
                 {
+                    HttpResponseMessage responseMessage = await HttpClient.GetAsync($"api/Cabinets/search/{cabinetNumber}");
                     string responseContent = await response.Content.ReadAsStringAsync();
                     Cabinet cabinet = JsonConvert.DeserializeObject<Cabinet>(responseContent);
                     await botClient.SendTextMessageAsync(callbackQuery.Message.Chat.Id, $"Найден кабинет:\n № кабинета {cabinet.Number}\n Кабинет называется: {cabinet.Name}\n\n Кабинет расположен: {cabinet.FloorLayoutId}");
                     return;
                 }
             }
+            #endregion
+
+            #region Функция Задать вопрос
+            if (callbackQuery.Data.StartsWith("/question"))
+            {
+                string question = callbackQuery.Data.Substring("/question ".Length);
+                int lastIndex;
+                using (var context = new OnboardingBotContext())
+                {
+                    lastIndex = context.UserQuestions
+                    .OrderByDescending(x => x.Id)
+                    .Select(x => x.Id)
+                    .FirstOrDefault();
+                }
+                var userQuestion = new
+                {
+                    Id = lastIndex++,
+                    Question = question,
+                    DateTimeQuestion = DateTime.Now,
+                };
+                var jsonPayload = JsonConvert.SerializeObject(userQuestion);
+
+                var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage questionResponse = await HttpClient.PostAsync("api/UserQuestions", content, cancellationToken);
+
+                if (questionResponse.IsSuccessStatusCode)
+                {
+                    await botClient.SendTextMessageAsync(callbackQuery.Message.Chat.Id, "Ваш вопрос был отправлен!");
+                }
+                else
+                {
+                    await botClient.SendTextMessageAsync(callbackQuery.Message.Chat.Id, "Ошибка! Не удалось отправить вопрос!");
+                }
+            }
+            #endregion
         }
 
         public static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {
-            // Некоторые действия
+            // Записываем ошибки в консоль
             Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(exception));
         }            
 
@@ -161,29 +204,14 @@ namespace OnboardingBot
             BotClient.StartReceiving(HandleUpdatesAsync, HandleErrorAsync, receiverOptions, cancellationToken);
         }
 
-
         private static async Task HandleOptionEmployees(ITelegramBotClient botClient, Update update)
-
         {
             var message = update.Message.Chat.Id;
             await botClient.SendTextMessageAsync(message, "Сотрудники");
             return;
         }
 
-        //private static async Task HandleOptionSearchCabinets(ITelegramBotClient botClient, Update update)
-        //{
-        //    var message = update.Message.Chat.Id;
-        //    await botClient.SendTextMessageAsync(message, "Поиск кабинета");
-        //    return;
-        //}
-
-        //private static async Task HandleOptionQuestion(ITelegramBotClient botClient, Update update)
-        //{
-        //    var message = update.Message.Chat.Id;
-        //    await botClient.SendTextMessageAsync(message, "Задать вопрос");
-        //    return;
-        //}
-
+        #region Функция Полезные ссылки
         private static async Task HandleOptionUsefulLinks(ITelegramBotClient botClient, Update update)
         {
             var message = update.Message.Chat.Id;
@@ -207,13 +235,16 @@ namespace OnboardingBot
             await botClient.SendTextMessageAsync(message, UlMessage);
             return;
         }
+        #endregion
 
+        #region Настройка HTTP клиента
         static async Task RunAsync()
         {
             HttpClient.BaseAddress = new Uri("https://localhost:7290");
             HttpClient.DefaultRequestHeaders.Accept.Clear();
             HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
+        #endregion
 
     }
 }
