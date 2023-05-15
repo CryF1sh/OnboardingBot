@@ -1,14 +1,16 @@
-﻿using Newtonsoft.Json;
+﻿using Azure;
+using Newtonsoft.Json;
 using OnboardingBot.Models;
 using Server;
-using Server.Entities;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Update = Telegram.Bot.Types.Update;
 
 namespace OnboardingBot
@@ -35,24 +37,25 @@ namespace OnboardingBot
                 return;
             }
 
-            HttpResponseMessage registrationResponse = await HttpClient.GetAsync("api/Users/" + update.Message.From.Id);
 
-            if (registrationResponse.IsSuccessStatusCode)//Проверка на зарегетрированного пользователя
-            {
-                switch (update.Message.Text)
-                {
-                    case "/my_teachers":
-                        await HandleOptionEmployees(botClient, update);
-                        break;
-                    case "/useful_links":
-                        await HandleOptionUsefulLinks(botClient, update);
-                        break;
-                }
-            }
-            else
-            {
-                await botClient.SendTextMessageAsync(update.Message.Chat.Id, "Ошибка! Для начала необходимо пройти регистрацию!\n Используйте /start, необходимо выбрать направление");
-            }
+            //HttpResponseMessage registrationResponse = await HttpClient.GetAsync("api/Users/" + update.Message.From.Id);
+
+            //if (registrationResponse.IsSuccessStatusCode)//Проверка на зарегетрированного пользователя
+            //{
+            //    switch (update.Message.Text)
+            //    {
+            //        case "/my_teachers":
+            //            await HandleOptionEmployees(botClient, update);
+            //            break;
+            //        case "/useful_links":
+            //            await HandleOptionUsefulLinks(botClient, update);
+            //            break;
+            //    }
+            //}
+            //else
+            //{
+            //    await botClient.SendTextMessageAsync(update.Message.Chat.Id, "Ошибка! Для начала необходимо пройти регистрацию!\n Используйте /start, необходимо выбрать направление");
+            //}
         }
         public static async Task HandleMessage(ITelegramBotClient botClient, Message message)
         {
@@ -67,10 +70,11 @@ namespace OnboardingBot
                     await botClient.SendTextMessageAsync(message.Chat.Id, "Ошибка! Не удалось найти направления!");
                     return;
                 }
+                //Читаем содержимое ответа в строку и десериализуем содержимое ответа в список объектов направлений.
                 string responseContent = await response.Content.ReadAsStringAsync();
-                //Десирилизация json в список
                 List<DirectionModel> directions = JsonConvert.DeserializeObject<List<DirectionModel>>(responseContent);
 
+                //Создаём список кнопок
                 List<InlineKeyboardButton> directionButtons = new List<InlineKeyboardButton>();
 
                 //Перебираем каждое направление из созданного списка
@@ -88,7 +92,97 @@ namespace OnboardingBot
             }
             #endregion
 
-            //await botClient.SendTextMessageAsync(message.Chat.Id, "Ошибка! Не удалось распознать команду!");
+            #region Функция Мои предподаватели
+            if (message.Text.ToLower() == "/my_teachers")
+            {
+                //Для функции необходимо выбрать направление, поэтому проверяем зарегестрирован ли пользователь
+                HttpResponseMessage registrationResponse = await HttpClient.GetAsync("api/Users/" + message.From.Id);
+
+                //Читаем содержимое ответа в строку и десериализуем содержимое ответа в объект пользователя.
+                string userResponseContent = await registrationResponse.Content.ReadAsStringAsync();
+                Models.User user = JsonConvert.DeserializeObject<Models.User>(userResponseContent);
+
+                if (registrationResponse.IsSuccessStatusCode)//Проверка на зарегетрированного пользователя
+                {
+                    HttpResponseMessage employeeDirectionResponse = await HttpClient.GetAsync("api/EmployeeDirections");
+
+                    //Читаем содержимое ответа в строку и десериализуем содержимое ответа в Список объектов.
+                    string responseContent = await employeeDirectionResponse.Content.ReadAsStringAsync();
+                    List<EmployeeDirection> employeeDirections = JsonConvert.DeserializeObject<List<EmployeeDirection>>(responseContent);
+
+                    foreach (EmployeeDirection employeeDirection in employeeDirections)
+                    {
+                        if (employeeDirection.DirectionId == user.DirectionId)
+                        {
+                            HttpResponseMessage employeeResponse = await HttpClient.GetAsync($"api/Employees/{employeeDirection.EmployeeId}");
+                            //Читаем содержимое ответа в строку и десериализуем содержимое ответа в Список объектов.
+                            string responseEmployeeContent = await employeeResponse.Content.ReadAsStringAsync();
+                            List<Employee> employees = JsonConvert.DeserializeObject<List<Employee>>(responseEmployeeContent);
+                            foreach (Employee employee in employees)
+                            {
+                                string employeeMessage = $"{employee.FullName}\nДолжность: {employee.Position}\n\n";
+                                // Проверка наличия описания
+                                if (employee.Description != null)
+                                {
+                                    // Добавление информации об описании
+                                    employeeMessage += $"Описание: {employee.Description}\n";
+                                }
+
+                                // Проверка наличия контактной информации
+                                if (employee.Email != null || employee.Telephone != null || employee.VkLink != null || employee.TelegramLink != null)
+                                {
+                                    employeeMessage += "Контакты:";
+
+                                    // Проверка наличия электронной почты
+                                    if (employee.Email != null)
+                                    {
+                                        // Добавление информации об электронной почте
+                                        employeeMessage += $"Email: {employee.Email}\n";
+                                    }
+
+                                    // Проверка наличия телефона
+                                    if (employee.Telephone != null)
+                                    {
+                                        // Добавление информации о телефоне
+                                        employeeMessage += $"Телефон: {employee.Telephone}\n";
+                                    }
+
+                                    // Проверка наличия ссылки на ВКонтакте
+                                    if (employee.VkLink != null)
+                                    {
+                                        // Добавление информации о ссылке на ВКонтакте
+                                        employeeMessage += $"VK: {employee.VkLink}\n";
+                                    }
+
+                                    // Проверка наличия ссылки на Telegram
+                                    if (employee.TelegramLink != null)
+                                    {
+                                        // Добавление информации о ссылке на Telegram
+                                        employeeMessage += $"Telegram: {employee.TelegramLink}\n";
+                                    }
+                                }
+
+                                // Проверка наличия ссылки на фото
+                                if (employee.PhotoLink != null)
+                                {
+                                    // Отправка сообщения с фото и информацией о сотруднике
+                                    await botClient.SendPhotoAsync(message.Chat.Id, photo: InputFile.FromUri(employee.PhotoLink), caption: employeeMessage);
+                                }
+                                else
+                                {
+                                    // Отправка текстового сообщения с информацией о сотруднике
+                                    await botClient.SendTextMessageAsync(message.Chat.Id, employeeMessage);
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    await botClient.SendTextMessageAsync(message.Chat.Id, "Ошибка! Для начала необходимо пройти регистрацию!\n Используйте /start, необходимо выбрать направление");
+                }
+            }
+            #endregion
         }
 
         public static async Task HandleCallbackQuery(ITelegramBotClient botClient, CallbackQuery callbackQuery, CancellationToken cancellationToken)
@@ -124,13 +218,16 @@ namespace OnboardingBot
             }
             #endregion
 
-
-
             #region Функция Поиск кабинета
             if (callbackQuery.Data.StartsWith("/search_cabinet"))
             {
+                // Извлечение номера кабинета из callback-запроса
                 string cabinetNumber = callbackQuery.Data.Substring("/search_cabinet ".Length);
+
+                // Отправка асинхронного GET-запроса для поиска кабинета по указанному номеру
                 HttpResponseMessage response = await HttpClient.GetAsync($"api/Cabinets/search/{cabinetNumber}");
+
+                // Проверка на наличие такого кабинета
                 if (response == null)
                 {
                     await botClient.SendTextMessageAsync(callbackQuery.Message.Chat.Id, "Ошибка! Не удалось найти кабинет!");
@@ -138,10 +235,46 @@ namespace OnboardingBot
                 }
                 if (response.IsSuccessStatusCode)
                 {
-                    HttpResponseMessage responseMessage = await HttpClient.GetAsync($"api/Cabinets/search/{cabinetNumber}");
+                    // Чтение содержимого ответа в виде строки и Десериализация содержимого ответа в объект Cabinet
                     string responseContent = await response.Content.ReadAsStringAsync();
                     Cabinet cabinet = JsonConvert.DeserializeObject<Cabinet>(responseContent);
-                    await botClient.SendTextMessageAsync(callbackQuery.Message.Chat.Id, $"Найден кабинет:\n № кабинета {cabinet.Number}\n Кабинет называется: {cabinet.Name}\n\n Кабинет расположен: {cabinet.FloorLayoutId}");
+
+                    // Отправка GET-запроса для получения информации о планировке этажа, связанной с кабинетом
+                    HttpResponseMessage responseMessage = await HttpClient.GetAsync($"api/FloorLayouts/{cabinet.FloorLayoutId}");
+
+                    // Чтение содержимого ответа о планировке этажа в виде строки и Десериализация содержимого ответа о планировке этажа в объект FloorLayout
+                    string responseContentFloorLayout = await responseMessage.Content.ReadAsStringAsync();
+                    FloorLayout floorLayout = JsonConvert.DeserializeObject<FloorLayout>(responseContentFloorLayout);
+                    string cabinetMessage = $"Найден кабинет:\n № кабинета {cabinet.Number}\n";
+
+                    // Проверка наличия названия кабинета
+                    if (cabinet.Name != null)
+                    {
+                        cabinetMessage += $"Кабинет называется: {cabinet.Name}\n\n";
+                    }
+
+                    // Проверка наличия названия планировки этажа
+                    if (floorLayout.Name != null)
+                    {
+                        cabinetMessage += $"Кабинет расположен на {floorLayout.Name}\n\n";
+                    }
+
+                    // Проверка наличия описания планировки этажа
+                    if (floorLayout.Description != null)
+                    {
+                        cabinetMessage += $"У этажа есть описание:\n {floorLayout.Description}\n";
+                    }
+
+                    // Проверка наличия ссылки на фото планировки этажа
+                    if (floorLayout.PhotoLink != null)
+                    {
+                        // Отправка сообщения с фото планировки и сообщением о кабинете в качестве подписи
+                        await botClient.SendPhotoAsync(callbackQuery.Message.Chat.Id, photo: InputFile.FromUri(floorLayout.PhotoLink), caption: cabinetMessage, cancellationToken: cancellationToken);
+                    }
+                    else
+                    {
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat.Id, cabinetMessage);
+                    }
                     return;
                 }
             }
@@ -150,44 +283,58 @@ namespace OnboardingBot
             #region Функция Задать вопрос
             if (callbackQuery.Data.StartsWith("/question"))
             {
+                // Извлечение вопроса из callback-запроса
                 string question = callbackQuery.Data.Substring("/question ".Length);
+
                 int lastIndex;
+                // Использование контекста базы данных OnboardingBotContext
                 using (var context = new OnboardingBotContext())
                 {
+                    // Получение последнего индекса вопроса из базы данных
                     lastIndex = context.UserQuestions
-                    .OrderByDescending(x => x.Id)
-                    .Select(x => x.Id)
-                    .FirstOrDefault();
+                        .OrderByDescending(x => x.Id)
+                        .Select(x => x.Id)
+                        .FirstOrDefault();
                 }
+
+                // Создание объекта userQuestion с данными о вопросе
                 var userQuestion = new
                 {
                     Id = lastIndex++,
                     Question = question,
                     DateTimeQuestion = DateTime.Now,
                 };
+
+                // Сериализация userQuestion в JSON-строку
                 var jsonPayload = JsonConvert.SerializeObject(userQuestion);
 
+                // Создание HTTP-контента с JSON-строкой
                 var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
+                // Отправка POST-запроса для добавления вопроса в базу данных
                 HttpResponseMessage questionResponse = await HttpClient.PostAsync("api/UserQuestions", content, cancellationToken);
 
+                // Проверка успешности ответа на POST-запрос
                 if (questionResponse.IsSuccessStatusCode)
                 {
+                    // Отправка сообщения о успешной отправке вопроса
                     await botClient.SendTextMessageAsync(callbackQuery.Message.Chat.Id, "Ваш вопрос был отправлен!");
                 }
                 else
                 {
+                    // Отправка сообщения об ошибке, если не удалось отправить вопрос
                     await botClient.SendTextMessageAsync(callbackQuery.Message.Chat.Id, "Ошибка! Не удалось отправить вопрос!");
                 }
             }
             #endregion
+
         }
 
         public static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
         {
             // Записываем ошибки в консоль
             Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(exception));
-        }            
+        }
 
         static void Main(string[] args)
         {
@@ -199,17 +346,11 @@ namespace OnboardingBot
             var cancellationToken = cts.Token;
             var receiverOptions = new ReceiverOptions
             {
-                AllowedUpdates = { }, 
+                AllowedUpdates = { },
             };
             BotClient.StartReceiving(HandleUpdatesAsync, HandleErrorAsync, receiverOptions, cancellationToken);
         }
 
-        private static async Task HandleOptionEmployees(ITelegramBotClient botClient, Update update)
-        {
-            var message = update.Message.Chat.Id;
-            await botClient.SendTextMessageAsync(message, "Сотрудники");
-            return;
-        }
 
         #region Функция Полезные ссылки
         private static async Task HandleOptionUsefulLinks(ITelegramBotClient botClient, Update update)

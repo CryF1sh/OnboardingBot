@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Server.Entities;
-
-public partial class FloorLayout
+﻿public partial class FloorLayout
 {
     public int Id { get; set; }
 
@@ -13,5 +8,4 @@ public partial class FloorLayout
 
     public string? PhotoLink { get; set; }
 
-    //public virtual ICollection<Cabinet> Cabinets { get; set; } = new List<Cabinet>();
 }
