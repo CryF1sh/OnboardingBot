@@ -1,0 +1,57 @@
+﻿@page
+@model AdminPanel.Pages.Questions.IndexModel
+
+@{
+    ViewData["Title"] = "Вопросы";
+}
+
+<h1>Вопросы</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UserQuestion[0].UserId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserQuestion[0].Question)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserQuestion[0].DateTimeQuestion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserQuestion[0].Answer)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserQuestion[0].DateTimeAnswer)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.UserQuestion) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Question)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateTimeQuestion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Answer)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateTimeAnswer)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Ответить</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Подробнее</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Удалить</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

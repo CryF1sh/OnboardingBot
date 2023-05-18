@@ -1,0 +1,55 @@
+﻿@page
+@model AdminPanel.Pages.Questions.EditModel
+
+@{
+    ViewData["Title"] = "Ответ на вопрос";
+}
+
+<h1>Вопрос пользователя</h1>
+
+<h4>Ответьте на вопрос</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="UserQuestion.Id" />
+            <div class="form-group">
+                <label asp-for="UserQuestion.UserId" class="control-label"></label>
+                <input asp-for="UserQuestion.UserId" class="form-control" />
+                <span asp-validation-for="UserQuestion.UserId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserQuestion.Question" class="control-label"></label>
+                <input asp-for="UserQuestion.Question" class="form-control" />
+                <span asp-validation-for="UserQuestion.Question" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserQuestion.DateTimeQuestion" class="control-label"></label>
+                <input asp-for="UserQuestion.DateTimeQuestion" class="form-control" />
+                <span asp-validation-for="UserQuestion.DateTimeQuestion" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserQuestion.Answer" class="control-label"></label>
+                <input asp-for="UserQuestion.Answer" class="form-control" />
+                <span asp-validation-for="UserQuestion.Answer" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserQuestion.DateTimeAnswer" class="control-label"></label>
+                <input asp-for="UserQuestion.DateTimeAnswer" class="form-control" />
+                <span asp-validation-for="UserQuestion.DateTimeAnswer" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Ответить" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Вернуться назад</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

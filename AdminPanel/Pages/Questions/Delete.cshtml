@@ -1,0 +1,52 @@
+﻿@page
+@model AdminPanel.Pages.Questions.DeleteModel
+
+@{
+    ViewData["Title"] = "Удаление вопроса";
+}
+
+<h1>Удалить вопрос?</h1>
+
+<h3>Вы действительно хотите удалить вопрос?</h3>
+<div>
+    <h4>Вопрос пользователя</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UserQuestion.UserId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserQuestion.UserId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UserQuestion.Question)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserQuestion.Question)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UserQuestion.DateTimeQuestion)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserQuestion.DateTimeQuestion)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UserQuestion.Answer)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserQuestion.Answer)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UserQuestion.DateTimeAnswer)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserQuestion.DateTimeAnswer)
+        </dd>
+    </dl>
+    
+    <form method="post">
+        <input type="hidden" asp-for="UserQuestion.Id" />
+        <input type="submit" value="Удалить" class="btn btn-danger" /> |
+        <a asp-page="./Index">Вернуться назад</a>
+    </form>
+</div>

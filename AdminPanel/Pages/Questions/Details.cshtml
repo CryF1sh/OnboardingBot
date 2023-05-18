@@ -1,0 +1,49 @@
+﻿@page
+@model AdminPanel.Pages.Questions.DetailsModel
+
+@{
+    ViewData["Title"] = "Просмотр вопроса";
+}
+
+<h1>Подробнее</h1>
+
+<div>
+    <h4>Вопрос пользователя</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UserQuestion.UserId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserQuestion.UserId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UserQuestion.Question)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserQuestion.Question)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UserQuestion.DateTimeQuestion)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserQuestion.DateTimeQuestion)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UserQuestion.Answer)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserQuestion.Answer)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.UserQuestion.DateTimeAnswer)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.UserQuestion.DateTimeAnswer)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.UserQuestion?.Id">Ответить</a> |
+    <a asp-page="./Index">Вернуться назад</a>
+</div>

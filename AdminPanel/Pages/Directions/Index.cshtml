@@ -1,0 +1,35 @@
+﻿@page
+@model AdminPanel.Pages.Directions.IndexModel
+
+@{
+    ViewData["Title"] = "Направления";
+}
+
+<h1>Направления</h1>
+
+<p>
+    <a asp-page="Create">Создать новое направление</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Direction[0].NameDirection)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Direction) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.NameDirection)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Изменить</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Удалить</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,28 @@
+﻿@page
+@model AdminPanel.Pages.Directions.DeleteModel
+
+@{
+    ViewData["Title"] = "Удаление направления";
+}
+
+<h1>Удаление</h1>
+
+<h3>Вы дейстивтельно хотите удалить его?</h3>
+<div>
+    <h4>Направление</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Direction.NameDirection)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Direction.NameDirection)
+        </dd>
+    </dl>
+    
+    <form method="post">
+        <input type="hidden" asp-for="Direction.Id" />
+        <input type="submit" value="Удалить" class="btn btn-danger" /> |
+        <a asp-page="./Index">Вернуться назад</a>
+    </form>
+</div>

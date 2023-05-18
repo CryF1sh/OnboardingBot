@@ -1,16 +1,13 @@
-﻿using Azure;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using OnboardingBot.Models;
 using Server;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Threading;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Update = Telegram.Bot.Types.Update;
 
 namespace OnboardingBot

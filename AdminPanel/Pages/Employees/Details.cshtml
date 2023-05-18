@@ -1,0 +1,79 @@
+﻿@page
+@model AdminPanel.Pages.Employees.DetailsModel
+
+@{
+    ViewData["Title"] = "Сотрудник";
+}
+
+<h1>Детали</h1>
+
+<div>
+    <h4>Сотрудник</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Employee.LastName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Employee.LastName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Employee.FirstName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Employee.FirstName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Employee.MiddleName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Employee.MiddleName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Employee.Position)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Employee.Position)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Employee.Description)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Employee.Description)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Employee.PhotoLink)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Employee.PhotoLink)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Employee.Email)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Employee.Email)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Employee.Telephone)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Employee.Telephone)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Employee.VkLink)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Employee.VkLink)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Employee.TelegramLink)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Employee.TelegramLink)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.Employee?.Id">Редактировать</a> |
+    <a asp-page="./Index">Вернуться назад</a>
+</div>

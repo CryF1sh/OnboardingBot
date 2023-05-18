@@ -1,4 +1,4 @@
-using OnboardingBotHTTPClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace AdminPanel
 {
@@ -8,28 +8,19 @@ namespace AdminPanel
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Intialize DB Context.
+            builder.Services.AddDbContext<Server.OnboardingBotContext>(options =>
+               options.UseNpgsql("Host=localhost;Port=5432;Database=OnboardingBot;Username=onboardingbot;Password=onboardingbot"));
+
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
-            builder.Services.AddHttpClient("Api", conf =>
-            {
-
-            });
-
-
-            builder.Services.AddSingleton<Client>(sp =>
-            {
-                var factory = sp.GetRequiredService<IHttpClientFactory>();
-                var client = factory.CreateClient("Api");
-                return new Client("https://localhost:7290", client);
-            });
-
+            builder.Services.AddRazorPages();
 
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
@@ -41,9 +32,7 @@ namespace AdminPanel
 
             app.UseAuthorization();
 
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+            app.MapRazorPages();
 
             app.Run();
         }

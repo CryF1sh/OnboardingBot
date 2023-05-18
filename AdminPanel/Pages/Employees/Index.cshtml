@@ -1,0 +1,42 @@
+﻿@page
+@model AdminPanel.Pages.Employees.IndexModel
+
+@{
+    ViewData["Title"] = "Сотрудники";
+}
+
+<h1>Сотрудники</h1>
+
+<p>
+    <a asp-page="Create">Создать нового сотрудника</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Employee[0].FullName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Employee[0].Position)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Employee) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FullName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Position)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Изменить</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Подробнее</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Удалить</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,80 @@
+﻿@page
+@model AdminPanel.Pages.Employees.EditModel
+
+@{
+    ViewData["Title"] = "Редактирование сотрудника";
+}
+
+<h1>Редактирование</h1>
+
+<h4>Сотрудник</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Employee.Id" />
+            <div class="form-group">
+                <label asp-for="Employee.LastName" class="control-label"></label>
+                <input asp-for="Employee.LastName" class="form-control" />
+                <span asp-validation-for="Employee.LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Employee.FirstName" class="control-label"></label>
+                <input asp-for="Employee.FirstName" class="form-control" />
+                <span asp-validation-for="Employee.FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Employee.MiddleName" class="control-label"></label>
+                <input asp-for="Employee.MiddleName" class="form-control" />
+                <span asp-validation-for="Employee.MiddleName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Employee.Position" class="control-label"></label>
+                <input asp-for="Employee.Position" class="form-control" />
+                <span asp-validation-for="Employee.Position" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Employee.Description" class="control-label"></label>
+                <input asp-for="Employee.Description" class="form-control" />
+                <span asp-validation-for="Employee.Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Employee.PhotoLink" class="control-label"></label>
+                <input asp-for="Employee.PhotoLink" class="form-control" />
+                <span asp-validation-for="Employee.PhotoLink" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Employee.Email" class="control-label"></label>
+                <input asp-for="Employee.Email" class="form-control" />
+                <span asp-validation-for="Employee.Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Employee.Telephone" class="control-label"></label>
+                <input asp-for="Employee.Telephone" class="form-control" />
+                <span asp-validation-for="Employee.Telephone" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Employee.VkLink" class="control-label"></label>
+                <input asp-for="Employee.VkLink" class="form-control" />
+                <span asp-validation-for="Employee.VkLink" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Employee.TelegramLink" class="control-label"></label>
+                <input asp-for="Employee.TelegramLink" class="form-control" />
+                <span asp-validation-for="Employee.TelegramLink" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Сохранить" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Вернуться назад</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

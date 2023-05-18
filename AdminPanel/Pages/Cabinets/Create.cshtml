@@ -1,0 +1,49 @@
+﻿@page
+@model AdminPanel.Pages.Cabinets.CreateModel
+
+@{
+    ViewData["Title"] = "Создание кабинета";
+}
+
+<h1>Создание</h1>
+
+<h4>Кабинет</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Cabinet.Number" class="control-label"></label>
+                <input asp-for="Cabinet.Number" class="form-control" />
+                <span asp-validation-for="Cabinet.Number" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Cabinet.Name" class="control-label"></label>
+                <input asp-for="Cabinet.Name" class="form-control" />
+                <span asp-validation-for="Cabinet.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Cabinet.EmployeeId" class="control-label"></label>
+                <input asp-for="Cabinet.EmployeeId" class="form-control" />
+                <span asp-validation-for="Cabinet.EmployeeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Cabinet.FloorLayoutId" class="control-label"></label>
+                <input asp-for="Cabinet.FloorLayoutId" class="form-control" />
+                <span asp-validation-for="Cabinet.FloorLayoutId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Создать" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Вернуться назад</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

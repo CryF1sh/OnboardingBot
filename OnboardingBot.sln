@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnboardingBot", "Onboarding
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "..\Server\Server\Server.csproj", "{7B182EDC-EACB-4197-AFF9-C21938E76C50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminPanel", "AdminPanel\AdminPanel.csproj", "{95E57236-EB2F-490B-BDA8-998CAC739C18}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminPanel", "AdminPanel\AdminPanel.csproj", "{C9C589DF-2E03-438B-BD0D-2A657B8812DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{7B182EDC-EACB-4197-AFF9-C21938E76C50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B182EDC-EACB-4197-AFF9-C21938E76C50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B182EDC-EACB-4197-AFF9-C21938E76C50}.Release|Any CPU.Build.0 = Release|Any CPU
-		{95E57236-EB2F-490B-BDA8-998CAC739C18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{95E57236-EB2F-490B-BDA8-998CAC739C18}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{95E57236-EB2F-490B-BDA8-998CAC739C18}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{95E57236-EB2F-490B-BDA8-998CAC739C18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9C589DF-2E03-438B-BD0D-2A657B8812DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9C589DF-2E03-438B-BD0D-2A657B8812DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9C589DF-2E03-438B-BD0D-2A657B8812DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9C589DF-2E03-438B-BD0D-2A657B8812DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
