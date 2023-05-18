@@ -3,6 +3,8 @@
 
 @{
     ViewData["Title"] = "Создание кабинета";
+
+    List<Server.Entities.FloorLayout> floorLayouts = ViewData["floorLayouts"] as List<Server.Entities.FloorLayout> ?? new List<Server.Entities.FloorLayout>();
 }
 
 <h1>Создание</h1>
@@ -30,7 +32,14 @@
             </div>
             <div class="form-group">
                 <label asp-for="Cabinet.FloorLayoutId" class="control-label"></label>
-                <input asp-for="Cabinet.FloorLayoutId" class="form-control" />
+                <select asp-for="Cabinet.FloorLayoutId" class="form-control">
+                    <option value="">Выберите этаж</option>
+                    @foreach (var floor in floorLayouts)
+                    {
+                        <option value="@floor.Id">@floor.Name</option>
+                    }
+                </select>
+
                 <span asp-validation-for="Cabinet.FloorLayoutId" class="text-danger"></span>
             </div>
             <div class="form-group">

@@ -192,7 +192,7 @@ namespace OnboardingBot
             {
                 // Извлечение номера кабинета из callback-запроса
                 string cabinetNumber = message.Text.Substring("/search_cabinet".Length).Trim();
-                if (cabinetNumber == null)
+                if (cabinetNumber == "")
                 {
                     await botClient.SendTextMessageAsync(message.Chat.Id, "Ошибка! Необходимо через пробел ввести номер кабинета!");
                     return;
@@ -257,7 +257,11 @@ namespace OnboardingBot
             {
                 // Извлечение вопроса из callback-запроса
                 string question = message.Text.Substring("/question".Length).Trim();
-
+                if(question == "")
+                {
+                    await botClient.SendTextMessageAsync(message.Chat.Id, "Ошибка! Необходимо ввести вопрос");
+                    return;
+                }
                 int lastIndex;
                 // Использование контекста базы данных OnboardingBotContext
                 using (var context = new OnboardingBotContext())
@@ -275,7 +279,7 @@ namespace OnboardingBot
                     Id = newIndex,
                     UserID = message.From.Id,
                     Question = question,
-                   //DateTimeQuestion = DateTime.Now,
+                    //DateTimeQuestion = DateTime.Now,
                 };
 
                 // Сериализация userQuestion в JSON-строку
