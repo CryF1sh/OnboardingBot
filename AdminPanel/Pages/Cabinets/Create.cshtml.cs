@@ -13,14 +13,25 @@ namespace AdminPanel.Pages.Cabinets
     public class CreateModel : PageModel
     {
         private readonly Server.OnboardingBotContext _context;
+        public List<Server.Entities.FloorLayout> FloorLayouts { get; set; }
 
-        public CreateModel(Server.OnboardingBotContext context)
-        {
-            _context = context;
-        }
+
+        //public CreateModel(Server.OnboardingBotContext context, List<Server.Entities.FloorLayout> floorLayouts)
+        //{
+        //    _context = context;
+        //    FloorLayouts = floorLayouts;
+        //}
 
         public IActionResult OnGet()
         {
+            List<Server.Entities.FloorLayout> floorLayouts;
+            using (var context = new OnboardingBotContext())
+            {
+                floorLayouts = context.FloorLayouts.ToList();
+            }
+
+            FloorLayouts = floorLayouts;
+
             return Page();
         }
 

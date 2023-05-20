@@ -4,7 +4,7 @@
 @{
     ViewData["Title"] = "Создание кабинета";
 
-    List<Server.Entities.FloorLayout> floorLayouts = ViewData["floorLayouts"] as List<Server.Entities.FloorLayout> ?? new List<Server.Entities.FloorLayout>();
+    List<Server.Entities.FloorLayout> floorLayouts = Model.FloorLayouts;
 }
 
 <h1>Создание</h1>
@@ -39,7 +39,6 @@
                         <option value="@floor.Id">@floor.Name</option>
                     }
                 </select>
-
                 <span asp-validation-for="Cabinet.FloorLayoutId" class="text-danger"></span>
             </div>
             <div class="form-group">

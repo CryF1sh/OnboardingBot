@@ -14,6 +14,7 @@ namespace AdminPanel.Pages.Cabinets
     public class EditModel : PageModel
     {
         private readonly Server.OnboardingBotContext _context;
+        public List<Server.Entities.FloorLayout> FloorLayouts { get; set; }
 
         public EditModel(Server.OnboardingBotContext context)
         {
@@ -29,6 +30,16 @@ namespace AdminPanel.Pages.Cabinets
             {
                 return NotFound();
             }
+
+            List<Server.Entities.FloorLayout> floorLayouts;
+            using (var context = new OnboardingBotContext())
+            {
+                floorLayouts = context.FloorLayouts.ToList();
+            }
+
+            FloorLayouts = floorLayouts;
+
+            return Page();
 
             var cabinet =  await _context.Cabinets.FirstOrDefaultAsync(m => m.Id == id);
             if (cabinet == null)
