@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Telegram.Bot;
 
 namespace AdminPanel
 {
@@ -14,7 +15,12 @@ namespace AdminPanel
 
             // Add services to the container.
             builder.Services.AddRazorPages();
-
+            builder.Services.AddHttpClient();
+            builder.Services.AddSingleton<TelegramBotClient>(sp =>
+            {
+                var botToken = "5654249846:AAHU6xVbyc8vGMpODDM9h9kAfS4khjBUgig";
+                return new TelegramBotClient(botToken);
+            });
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
