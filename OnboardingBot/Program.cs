@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using OnboardingBot.Models;
 using Server;
+using Server.Entities;
 using System.Net.Http.Headers;
 using System.Text;
 using Telegram.Bot;
@@ -331,7 +332,18 @@ namespace OnboardingBot
 
                 if (registrationResponse.IsSuccessStatusCode)
                 {
-                    await botClient.SendTextMessageAsync(callbackQuery.Message.Chat.Id, "Регистрация прошла успешно! Вы выбрали направление - " + directionId);
+                    HttpResponseMessage response = await HttpClient.GetAsync($"api/Directions/{directionId}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseContent = await response.Content.ReadAsStringAsync();
+                        DirectionModel direction = JsonConvert.DeserializeObject<DirectionModel>(responseContent);
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat.Id, $"Регистрация прошла успешно! Вы выбрали направление - {direction.NameDirection}");
+                        await botClient.SendTextMessageAsync(callbackQuery.Message.Chat.Id, "Команды, которым я обучен:\n\n/my_teachers - Покажет вам администрацию техникума и предподавателей по твоим предметам\n" +
+                            "/search_cabinet {Номер кабинета} - Если просмотрев расписание Вы увидели незнакомый для себя кабинет, то вы можете воспользоваться данной командой, чтобы узнать где он расположен\n" +
+                            "/question {Ваш вопрос} - Если у вас появились вопросы, вы можете задать вопрос, и получить ответ от администратора\n" +
+                            "/useful_links - Используйте для просмотра полезных ссылок");
+                    }
                 }
                 else
                 {
