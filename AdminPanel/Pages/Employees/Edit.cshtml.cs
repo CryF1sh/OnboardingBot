@@ -23,6 +23,11 @@ namespace AdminPanel.Pages.Employees
         [BindProperty]
         public Employee Employee { get; set; } = default!;
 
+        public List<Direction> Directions { get; set; }
+
+        [BindProperty]
+        public List<int> SelectedDirectionIds { get; set; }
+
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null || _context.Employees == null)
@@ -36,6 +41,14 @@ namespace AdminPanel.Pages.Employees
                 return NotFound();
             }
             Employee = employee;
+            var selectedDirectionIds = _context.EmployeeDirections
+                .Where(ed => ed.EmployeeId == employee.Id)
+                .Select(ed => ed.DirectionId)
+                .ToList();
+
+            SelectedDirectionIds = selectedDirectionIds;
+
+            Directions = _context.Directions.ToList();
             return Page();
         }
 
@@ -45,10 +58,48 @@ namespace AdminPanel.Pages.Employees
         {
             if (!ModelState.IsValid)
             {
+                Directions = _context.Directions.ToList();
                 return Page();
             }
 
-            _context.Attach(Employee).State = EntityState.Modified;
+            // Получаем данные о сотруднике из базы данных
+            var employee = await _context.Employees.FindAsync(Employee.Id);
+
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            // Обновляем свойства сотрудника
+            employee.LastName = Employee.LastName;
+            employee.FirstName = Employee.FirstName;
+            employee.MiddleName = Employee.MiddleName;
+            employee.Position = Employee.Position;
+            employee.Description = Employee.Description;
+            employee.PhotoLink = Employee.PhotoLink;
+            employee.Email = Employee.Email;
+            employee.Telephone = Employee.Telephone;
+            employee.VkLink = Employee.VkLink;
+            employee.TelegramLink = Employee.TelegramLink;
+
+            // Удаляем существующие записи в таблице EmployeeDirections для данного сотрудника
+            var existingDirections = _context.EmployeeDirections
+                .Where(ed => ed.EmployeeId == employee.Id)
+                .ToList();
+
+            _context.EmployeeDirections.RemoveRange(existingDirections);
+
+            // Добавляем новые записи в таблицу EmployeeDirections на основе выбранных направлений
+            foreach (var directionId in SelectedDirectionIds)
+            {
+                var employeeDirection = new EmployeeDirection
+                {
+                    EmployeeId = employee.Id,
+                    DirectionId = directionId
+                };
+
+                _context.EmployeeDirections.Add(employeeDirection);
+            }
 
             try
             {
@@ -68,6 +119,7 @@ namespace AdminPanel.Pages.Employees
 
             return RedirectToPage("./Index");
         }
+
 
         private bool EmployeeExists(int id)
         {

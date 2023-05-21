@@ -3,6 +3,8 @@
 
 @{
     ViewData["Title"] = "Создание сотрудника";
+
+    List<Server.Entities.Direction> directions = Model.AvailableDirections;
 }
 
 <h1>Создание</h1>
@@ -33,7 +35,16 @@
                 <input asp-for="Employee.Position" class="form-control" />
                 <span asp-validation-for="Employee.Position" class="text-danger"></span>
             </div>
-
+            <h4>Выберите направления</h4>
+            <div class="form-group">
+                @foreach (var direction in Model.AvailableDirections)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="direction-@direction.Id" name="SelectedDirections" value="@direction.Id">
+                        <label class="form-check-label" for="direction-@direction.Id">@direction.NameDirection</label>
+                    </div>
+                }
+            </div>
             <div class="form-group">
                 <label asp-for="Employee.Description" class="control-label"></label>
                 <input asp-for="Employee.Description" class="form-control" />
@@ -76,5 +87,35 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    @* <script>
+        function submitForm() {
+            // Отправка первого POST-запроса
+            $.ajax({
+                url: '/path/to/first/endpoint',
+                method: 'POST',
+                data: $('#yourFormId').serialize(),
+                success: function (result) {
+                    // Обработка успешного выполнения первого запроса
+                    // Отправка второго POST-запроса
+                    $.ajax({
+                        url: '/path/to/second/endpoint',
+                        method: 'POST',
+                        data: $('#yourFormId').serialize(),
+                        success: function (result) {
+                            // Обработка успешного выполнения второго запроса
+                        },
+                        error: function (xhr, status, error) {
+                            // Обработка ошибки второго запроса
+                        }
+                    });
+                },
+                error: function (xhr, status, error) {
+                    // Обработка ошибки первого запроса
+                }
+            });
+        }
+    </script>*@
 }

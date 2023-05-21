@@ -39,6 +39,16 @@
                 <input asp-for="Employee.Description" class="form-control" />
                 <span asp-validation-for="Employee.Description" class="text-danger"></span>
             </div>
+            <h4>Выберите направления</h4>
+            <div class="form-group">
+                @foreach (var direction in Model.Directions)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="direction-@direction.Id" name="SelectedDirectionIds" value="@direction.Id" @(Model.SelectedDirectionIds.Contains(direction.Id) ? "checked" : "")>
+                        <label class="form-check-label" for="direction-@direction.Id">@direction.NameDirection</label>
+                    </div>
+                }
+            </div>
             <div class="form-group">
                 <label asp-for="Employee.PhotoLink" class="control-label"></label>
                 <input asp-for="Employee.PhotoLink" class="form-control" />
