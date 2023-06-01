@@ -71,7 +71,7 @@ namespace OnboardingBot
             }
             #endregion
 
-            #region Функция Мои предподаватели
+            #region Функция Мои преподаватели
             if (message.Text.ToLower() == "/my_teachers")
             {
                 //Для функции необходимо выбрать направление, поэтому проверяем зарегестрирован ли пользователь

@@ -2,12 +2,12 @@
 @model AdminPanel.Pages.Floor.CreateModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Создание этажа";
 }
 
-<h1>Create</h1>
+<h1>Создание</h1>
 
-<h4>FloorLayout</h4>
+<h4>Этаж</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -29,14 +29,14 @@
                 <span asp-validation-for="FloorLayout.PhotoLink" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Создать" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-page="Index">Back to List</a>
+    <a asp-page="Index">Вернуться назад</a>
 </div>
 
 @section Scripts {
